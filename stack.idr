@@ -12,6 +12,7 @@ namespace StackMachine
     AddExpr : (e1 : Expr Natural) -> (e2 : Expr Natural) -> Expr Natural
     IfExpr : (b: Expr Boolean) -> (e1 : Expr tyExp) -> (e2 : Expr tyExp) -> Expr tyExp
 
+-- expressions to values
   eval: Expr tyExp -> Val tyExp    
   eval (ValExpr v) = v
   eval (AddExpr e1 e2) = case eval e1 of 
@@ -20,8 +21,36 @@ namespace StackMachine
   eval (IfExpr b e1 e2) = case eval b of
                             BoolVal b => if b then eval e1 else eval e2
 
+-- Expr Tests
+  testExpr: Val Natural
+--   testExpr = let exp1 = IfExpr (ValExpr (BoolVal False)) (ValExpr (NatVal 2)) (ValExpr (NatVal 3)) in
+  testExpr = let exp1 = IfExpr (ValExpr (BoolVal True)) (AddExpr (ValExpr (NatVal 2)) (ValExpr (NatVal 3))) (ValExpr (NatVal 123)) in
+    eval exp1
 
---   data Stack: Type where
+
+--   data StackType = List TyExp
+
+  data Stack : List TyExp -> Type where
+    EmptyStack : Stack []
+    ConsStack : (v : Val tyExp) -> (s: Stack list) -> Stack (tyExp::list)
+
+  data Code : List TyExp -> List TyExp -> Type where
+    SkipCode : Code s s
+    PushCode : (v : Val tyExp) -> Code s (tyExp::s)
+    AddCode : Code (Natural :: Natural :: s) (Natural :: s)
+    IfCode : (c1 : Code s s') -> (c2 : Code s s') -> Code (Boolean :: s) s'
+    SeqCode : (c1 : Code s1 s2) -> (c2 : Code s2 s3) -> Code s1 s3
+
+-- executes stack operations
+  exec : Code sIn sOut -> Stack sIn -> Stack sOut
+  exec SkipCode s = s
+  exec (PushCode v) s = (ConsStack v s)
+--   exec AddCode ConsStack x (ConsStack y s) = ?sadfasdf
+  exec AddCode x = ?asdf
+  exec (IfCode c1 c2) y = ?exec_rhs_4
+  exec (SeqCode c1 c2) y = ?exec_rhs_5
+
+--   data Stack: Type wheret
 --     Empty : Stack
 --     Cons : (ty: TyExp) -> (stack: Stack) -> Stack
 
