@@ -34,6 +34,11 @@ namespace StackMachine
     Empty : Stack []
     (::): (v : Val tyExp) -> (s: Stack list) -> Stack (tyExp::list)
 
+  Eq (Stack tyExpsts) where
+    (==) Empty Empty = True
+    (==) ((NatVal n1) :: s1) ((NatVal n2) :: s2) = (n1 == n2) && (s1 == s2)
+    (==) ((BoolVal b1) :: s1) ((BoolVal b2) :: s2) = (b1 == b2) && (s1 == s2)
+
   data Code : List TyExp -> List TyExp -> Type where
     SkipCode : Code s s
     PushCode : (v : Val tyExp) -> Code s (tyExp::s)
@@ -56,4 +61,5 @@ namespace StackMachine
   compile (AddExpr e1 e2) = (compile e2) ++ (compile e1) ++ AddCode
   compile (IfExpr b e1 e2) = (compile b) ++ (IfCode (compile e1) (compile e2))
 
-  correct: Expr tyExp1 -> Stack (List tyExp2) -> Bool
+  correct: Expr tyExp -> Stack tyExps -> Bool
+  correct e s = (eval e) :: s == exec (compile e) s
